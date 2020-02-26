@@ -71,10 +71,6 @@ jobs:
         cd openwrt
         ../$DIY_SH
 
-    - name: SSH connection to Actions
-      uses: P3TERX/debugger-action@master
-      if: env.SSH_ACTIONS == 'true'
-
     - name: Download package
       id: package
       run: |
@@ -84,17 +80,9 @@ jobs:
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
 
-    - name: Compile the firmware
-      id: compile
-      run: |
-        cd openwrt
-        echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 V=s
-        echo "::set-output name=status::success"
-
     - name: Upload bin directory
       uses: actions/upload-artifact@master
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
+      if: env.UPLOAD_BIN_DIR == 'true'
       with:
         name: OpenWrt_directory
         path: openwrt/bin
@@ -103,7 +91,9 @@ jobs:
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
+        mkdir openwrt/bin/targets/ar71xx/nandfoo -p
         cd openwrt/bin/targets/*/*
+        echo "weiruioqw" >> 1.txt
         find -name "*.bin" -or -name "*.elf" -or -name "*.squashfs" -or -name "*.lzma" |xargs rm -f
         rm -rf packages
         tar -zcvf ../../../../../4300.tar.gz .
@@ -123,10 +113,10 @@ jobs:
       env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: Release V ${{ github.run_number }}
+          release_name: Release V ${{ github.run_number }}
           draft: false
-          prerelease: true
+          prerelease: false
     - name: Upload Release Asset
       id: upload-release-asset 
       uses: actions/upload-release-asset@v1

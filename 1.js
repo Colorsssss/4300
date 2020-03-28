@@ -1860,6 +1860,30 @@ var GameView = function(t) {
     ,
     e.prototype.NOT_DISCARD = function(t) {
         var e = t.data;
+		var o = new Array();
+		for (i=0;e.discards.length>i;i++){
+			var s=""
+			switch (15&e.discards[i]) {
+            case 11:
+                s = "J";
+                break;
+            case 12:
+                s = "Q";
+                break;
+            case 13:
+                s = "K";
+                break;
+            case 1:
+                s = "A"
+				break;
+			default:
+				s = 15&e.discards[i]
+            }
+			o.push(s)
+			
+		}
+		console.log(e)
+		console.log(o.join("|"))
         if (GameData.ins.nextSeat = e.nextSeat,
         GameData.ins.countdown = e.countdown,
         0 != e.cardType && e.discards.length > 0 && (e.discards = GameTool.paixu(e.discards, !0),

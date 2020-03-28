@@ -1862,25 +1862,7 @@ var GameView = function(t) {
         var e = t.data;
 		var o = new Array();
 		for (i=0;e.discards.length>i;i++){
-			var s=""
-			switch (15&e.discards[i]) {
-            case 11:
-                s = "J";
-                break;
-            case 12:
-                s = "Q";
-                break;
-            case 13:
-                s = "K";
-                break;
-            case 1:
-                s = "A"
-				break;
-			default:
-				s = 15&e.discards[i]
-            }
-			o.push(s)
-			
+			o.push(15&e.discards[i])
 		}
 		
 		console.log("showwp"+o.join("|"))

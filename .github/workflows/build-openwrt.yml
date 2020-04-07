@@ -101,8 +101,7 @@ jobs:
       id: organize
       if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
       run: |
-        mv openwrt/.config openwrt/bin/targets/*/*/.config
-        cd openwrt/bin/targets/*//
+        cd openwrt/bin/targets/*/*/
         find -name "*.bin" -or -name "*.elf" -or -name "*.squashfs" -or -name "*.lzma" |xargs rm -f
         rm -rf packages
         tar -zcvf ../../../../../4300.tar.gz .

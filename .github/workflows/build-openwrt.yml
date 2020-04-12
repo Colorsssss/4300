@@ -24,9 +24,9 @@ env:
   REPO_BRANCH: master
   CONFIG_FILE: .config
   DIY_SH: diy.sh
-  SSH_ACTIONS: true
+  SSH_ACTIONS: false
   UPLOAD_BIN_DIR: true
-  UPLOAD_FIRMWARE: false
+  UPLOAD_FIRMWARE: true
   TZ: Asia/Shanghai
 
 jobs:
@@ -59,7 +59,7 @@ jobs:
       run: cd openwrt && ./scripts/feeds install -a
 
     - name: music
-      run: cd openwrt/package && git clone https://github.com/maxlicheng/luci-app-unblockmusic.git && git clone https://github.com/rufengsuixing/luci-app-adguardhome.git
+      run: cd openwrt/package && git clone https://github.com/rufengsuixing/luci-app-adguardhome.git
     
     - name: Load custom configuration
       run: |

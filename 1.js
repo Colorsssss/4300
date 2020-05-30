@@ -1,3 +1,4 @@
+var aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;
 var __reflect = this && this.__reflect || function(t, e, i) {
     t.__class__ = e,
     i ? i.push(e) : i = [e],
@@ -230,9 +231,7 @@ var BaseSound = function() {
 }();
 __reflect(BaseSound.prototype, "BaseSound");
 var MessageScoketReceive = function() {
-    function t(t) {
-        this.factory = t
-    }
+    function t() {}
     return t.prototype.initHandlers = function(t, e) {
         switch (t) {
         case MessageProtocol.ACK | MessageProtocol.LOGIN:
@@ -244,16 +243,15 @@ var MessageScoketReceive = function() {
     }
     ,
     t.prototype.OGID_UserLogin = function(t) {
-        var e = this.factory.build("ackLogin");
-        e.decode(t.buffer)
+        var e = ArrayUtils.decodeByteArray(t, message.ackLogin);
+        0 == e.result ? console.log("message登录成功") : console.log("message登录失败")
     }
     ,
     t.prototype.OGID_GetMessage = function(t) {
-        var e = this.factory.build("NotifyMsgNtc")
-          , i = e.decode(t.buffer)
-          , s = [];
-        s.push("[" + i.title + "]:" + i.content),
-        MessageUI.ins.showMessage(s)
+        var e = ArrayUtils.decodeByteArray(t, message.NotifyMsgNtc)
+          , i = [];
+        i.push("[" + e.title + "]:" + e.content),
+        MessageUI.ins.showMessage(i)
     }
     ,
     t
@@ -386,7 +384,8 @@ var ViewManager = function(t) {
     ,
     e.prototype.hideGameVie = function() {
         this.gameView && this.gameView.parent && (this.gameView.parent.removeChild(this.gameView),
-        GameData.ins.allowedToQuit = !0)
+        GameData.ins.allowedToQuit = !0),
+        this.roomView && this.roomView.initData()
     }
     ,
     e.prototype.showSet = function() {
@@ -1528,7 +1527,8 @@ var GameView = function(t) {
             var i = PDKParems.ins.roomList[e];
             PDKParems.ins.roomId == i.id && (GameData.ins.roomData = i)
         }
-        this.changguan.text = this.roomIDtoSource(PDKParems.ins.roomId) + " 底" + ChipUtils.formatCoin(Number(GameData.ins.roomData.baseScore))
+        this.changguan.text = this.roomIDtoSource(PDKParems.ins.roomId) + " 底" + ChipUtils.formatCoin(Number(GameData.ins.roomData.baseScore)),
+        this.addChild(MessageUI.ins)
     }
     ,
     e.prototype.showLoadingTip = function() {
@@ -1861,14 +1861,14 @@ var GameView = function(t) {
     e.prototype.NOT_DISCARD = function(t) {
         var e = t.data;
 		var o = new Array();
-		if (e.seatNo !=0){
-			for (i=0;e.discards.length>i;i++){
-			o.push(15&e.discards[i])
-			}
-		}
-		
-		
-		console.log("showwp"+o.join("|"))
+		        if (e.seatNo !=0){
+		            for (i=0;e.discards.length>i;i++){
+		            o.push(15&e.discards[i])
+		            }
+		        }
+		        
+		        
+		        console.log("showwp"+o.join("|"))
         if (GameData.ins.nextSeat = e.nextSeat,
         GameData.ins.countdown = e.countdown,
         0 != e.cardType && e.discards.length > 0 && (e.discards = GameTool.paixu(e.discards, !0),
@@ -2807,11 +2807,9 @@ var TakeCardUI = function(t) {
                 s.touchEnabled = !1,
                 this.takeCardUI.push(s)
             }
-            this.setPosition(),
-            console.log("普通出牌")
+            this.setPosition()
         } else
-            SoundManager.getInstance().playEffect("b_noCard1_mp3"),
-            console.log("出牌不出")
+            SoundManager.getInstance().playEffect("b_noCard1_mp3")
     }
     ,
     e.prototype.setTip = function(t, e) {
@@ -2991,7 +2989,7 @@ var UserItem = function(t) {
     e.prototype.initMyData = function(t) {
         void 0 === t && (t = null),
         this.topTip.source = "",
-        this.nameLable.text = PDKParems.ins.userName,
+        this.nameLable.text = PDKParems.ins.nickName,
         null != t ? this.goldCoinLable.text = ChipUtils.formatCoin(Number(t.goldCoin)) + "" : this.goldCoinLable.text = ChipUtils.formatCoin(PDKParems.ins.goldCoin) + "",
         this.rmbLable.text = PDKParems.ins.goldCoin / PDKParems.ins.nChange + "",
         this.jdDisplay.animation.stop(),
@@ -3194,8 +3192,7 @@ var HandCards = function(t) {
     }
     ,
     e.prototype.ON_MY_HAND_CARD_SHOW = function() {
-        GameData.ins.dealEnd = !1,
-        console.log("开始发牌动画");
+        GameData.ins.dealEnd = !1;
         for (var t = 0; t < this.timeOutArr.length; t++)
             egret.clearTimeout(this.timeOutArr[t]);
         if (this.timeOutArr = [],
@@ -3614,26 +3611,23 @@ var LoadingUI = function(t) {
 }(egret.Sprite);
 __reflect(LoadingUI.prototype, "LoadingUI", ["RES.PromiseTaskReporter"]);
 var MessageSocketSender = function() {
-    function t(t) {
-        this.factory = t
-    }
+    function t() {}
     return t.prototype.HeartBeatReq = function() {
-        var t = this.factory.build("HeartBeatReq")
-          , e = new t({
-            time: 1
-        });
+        var t = new message.HeartBeatReq;
+        t.time = 1;
+        var e = message.HeartBeatReq.encode(t).finish();
+        console.log("发送心跳"),
         MessageWebSocket.instance().SendMeseage(MessageProtocol.REQ | MessageProtocol.HeartBeat, e)
     }
     ,
     t.prototype.loginMessage = function() {
-        var t = this.factory.build("reqLogin")
-          , e = new t({
-            userName: PDKParems.ins.userName,
-            avatarUrl: "",
-            channelId: "",
-            gameId: PDKParems.ins.nGameid,
-            ticket: PDKParems.ins.token
-        });
+        var t = new message.reqLogin;
+        t.userName = PDKParems.ins.userName,
+        t.avatarUrl = "",
+        t.channelId = "",
+        t.gameId = PDKParems.ins.nGameid,
+        t.ticket = PDKParems.ins.token;
+        var e = message.reqLogin.encode(t).finish();
         MessageWebSocket.instance().SendMeseage(MessageProtocol.REQ | MessageProtocol.LOGIN, e)
     }
     ,
@@ -3650,12 +3644,9 @@ var MessageUI = function(t) {
         e.x = 505,
         e.sprBg = new egret.Sprite,
         e.addChild(e.sprBg);
-        var i = Utils.createBitmapByName("pmddb_png");
-        e.sprBg.addChild(i);
-        var s = Utils.createBitmapByName("pmdbz_png");
-        return s.x = 55,
-        s.y = 10,
-        e.sprBg.addChild(s),
+        var i = Utils.createBitmapByName("pmd_png");
+        return i.width = 900,
+        e.sprBg.addChild(i),
         e.group = new eui.Group,
         e.addChild(e.group),
         e.txt = new egret.TextField,
@@ -3668,8 +3659,8 @@ var MessageUI = function(t) {
         e.group.addChild(e.txt),
         e.scroll = new eui.Scroller,
         e.scroll.touchEnabled = !1,
-        e.scroll.x = 140,
-        e.scroll.width = i.width - 145,
+        e.scroll.x = 40,
+        e.scroll.width = i.width - 45,
         e.scroll.height = i.height,
         e.scroll.viewport = e.group,
         e.addChild(e.scroll),
@@ -3721,7 +3712,9 @@ var MessageWebSocket = function() {
         this.webSocket.addEventListener(egret.ProgressEvent.SOCKET_DATA, this.onReceiveMessage, this),
         this.webSocket.addEventListener(egret.Event.CONNECT, this.onSocketOpen, this),
         this.webSocket.addEventListener(egret.Event.CLOSE, this.onSocketClose, this),
-        this.webSocket.addEventListener(egret.IOErrorEvent.IO_ERROR, this.onSocketError, this)
+        this.webSocket.addEventListener(egret.IOErrorEvent.IO_ERROR, this.onSocketError, this),
+        this.msgSender = new MessageSocketSender,
+        this.msgReceive = new MessageScoketReceive
     }
     return t.instance = function() {
         return null != t.ins || (t.ins = new t),
@@ -3749,7 +3742,7 @@ var MessageWebSocket = function() {
     ,
     t.prototype.SendMeseage = function(t, e) {
         if (0 != this.webSocket.connected) {
-            var i = e.toArrayBuffer()
+            var i = e
               , s = new egret.ByteArray(i)
               , a = s.length
               , n = new egret.ByteArray;
@@ -4098,7 +4091,8 @@ var RoomView = function(_super) {
         this.btnHall.visible = PDKParems.ins.isShowHall,
         this.btnHall.includeInLayout = PDKParems.ins.isShowHall,
         this.roomList.dataProvider = new eui.ArrayCollection(PDKParems.ins.roomList),
-        this.imgHead.source = PDKParems.ins.headURL + "iconHead" + PDKParems.ins.userHead + ".png"
+        this.imgHead.source = PDKParems.ins.headURL + "iconHead" + PDKParems.ins.userHead + ".png",
+        this.addChild(MessageUI.ins)
     }
     ,
     RoomView.prototype.initTopinfo = function() {
@@ -5037,14 +5031,14 @@ var RoomSocketReceive = function() {
     ,
     t.prototype.NOT_DEAL = function(t) {
         var e = ArrayUtils.decodeByteArray(t, proto.NotDealCard);
-        console.log("发牌通知消息" + e.nextSeat + " " + e.seat0),
         GameData.ins.roundId = e.roundId,
+		console.log("发牌通知消息" + e.nextSeat + " " + e.seat0),
         RoomEventDispatcher.getInstance().dispatchEvent(new DateEvent(RoomEventDispatcher.NOT_DEAL,e))
     }
     ,
     t.prototype.NOT_DISCARD = function(t) {
         var e = ArrayUtils.decodeByteArray(t, proto.NotDiscard);
-        console.log("出牌消息" + e.tableId + " " + e.seat0),
+		console.log("出牌消息" + e.tableId + " " + e.seat0),
         RoomEventDispatcher.getInstance().dispatchEvent(new DateEvent(RoomEventDispatcher.NOT_DISCARD,e))
     }
     ,
@@ -5440,6 +5434,10 @@ var Main = function(_super) {
         var e = new AssetAdapter;
         egret.registerImplementation("eui.IAssetAdapter", e),
         egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter),
+        "true" == egret.getOption("isLog") || (console.log = function() {
+            return !1
+        }
+        ),
         this.runGame()["catch"](function(t) {
             console.log(t)
         }),
@@ -5530,7 +5528,8 @@ var Main = function(_super) {
             egret.getOption("token") && null != egret.getOption("token") && (PDKParems.ins.userName = egret.getOption("token"),
             PDKParems.ins.nickName = egret.getOption("token"),
             PDKParems.ins.token = egret.getOption("token")),
-            RoomWebSocket.instance().connectServer();
+            RoomWebSocket.instance().connectServer(),
+            MessageWebSocket.instance().connectServer();
         else {
             egret.ImageLoader.crossOrigin = "anonymous",
             PDKParems.ins.token = egret.getOption("token");
@@ -5614,7 +5613,8 @@ var Main = function(_super) {
                 if ("1" == jsondata.result)
                     if (this.isCheckGame = !0,
                     "otherGame" != jsondata.msg)
-                        RoomWebSocket.instance().connectServer();
+                        RoomWebSocket.instance().connectServer(),
+                        MessageWebSocket.instance().connectServer();
                     else {
                         var str = "";
                         jsondata.otherGame && (str = jsondata.otherGame),
@@ -5623,12 +5623,14 @@ var Main = function(_super) {
                         })
                     }
                 else
-                    0 == this.isCheckGame && RoomWebSocket.instance().connectServer(),
+                    0 == this.isCheckGame && (RoomWebSocket.instance().connectServer(),
+                    MessageWebSocket.instance().connectServer()),
                     this.isCheckGame = !0
             }
         }, this.onHttpError, this, "token=" + PDKParems.ins.token + "&gametype=" + PDKParems.ins.gametype),
         egret.setTimeout(function() {
-            0 == this.isCheckGame && RoomWebSocket.instance().connectServer(),
+            0 == this.isCheckGame && (RoomWebSocket.instance().connectServer(),
+            MessageWebSocket.instance().connectServer()),
             this.isCheckGame = !0
         }, this, 5e3)
     }
@@ -5673,7 +5675,7 @@ var PDKParems = function() {
         this.isTest = !1,
         this.urlTest = !1,
         this.dealCardShow = !1,
-        this.version = "1.1.1.6",
+        this.version = "1.1.1.7",
         this.isShowCoin = !0,
         this.exchange = 2,
         this.token = "",
@@ -5897,13 +5899,28 @@ var ChipUtils = function() {
         return String(t)
     }
     ,
-    t.formatCoin = function(t, e, i) {
-        void 0 === e && (e = !1),
-        void 0 === i && (i = 11);
-        var s = "";
-        return s = PDKParems.ins.isShowCoin ? Number(t).toLocaleString() : t % PDKParems.ins.exchange == 0 ? (t / PDKParems.ins.exchange).toLocaleString() : Number((t / PDKParems.ins.exchange).toFixed(2)).toLocaleString(),
-        e && s.length > i && (s = s.slice(0, 8) + "..."),
-        s
+    t.formatCoin = function(e, i, s) {
+        void 0 === i && (i = !1),
+        void 0 === s && (s = 11);
+        var a = "";
+        return a = PDKParems.ins.isShowCoin ? Number(e) + "" : e % PDKParems.ins.exchange == 0 ? e / PDKParems.ins.exchange + "" : Number((e / PDKParems.ins.exchange).toFixed(2)) + "",
+        i && a.length > s && (a = a.slice(0, 8) + "..."),
+        a = t.fmoney(Number(a), 3, 2, !0)
+    }
+    ,
+    t.fmoney = function(t, e, i, s) {
+        i = i > 0 && 20 >= i ? i : 2,
+        t = parseFloat((t + "").replace(/[^\d\.-]/g, "")).toFixed(i) + "";
+        for (var a = t.split(".")[0].split("").reverse(), n = t.split(".")[1], o = "", r = 0; r < a.length; r++)
+            o += a[r] + ((r + 1) % e == 0 && r + 1 != a.length ? "," : "");
+        if (s) {
+            if ("0" == n || "00" == n)
+                return o.split("").reverse().join("");
+            var h = "";
+            return 2 == n.length ? (h = "0" == n.charAt(1) ? n.substr(0, 1) : n.substr(0, 2),
+            o.split("").reverse().join("") + "." + h) : o.split("").reverse().join("") + "." + n
+        }
+        return o.split("").reverse().join("")
     }
     ,
     t.toNumUpper = function(t) {

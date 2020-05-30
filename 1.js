@@ -1,4 +1,4 @@
-var aaaaaaaaaqweaaaa;
+var aaaaaaaaaqweac;
 var __reflect = this && this.__reflect || function(t, e, i) {
     t.__class__ = e,
     i ? i.push(e) : i = [e],
@@ -5434,10 +5434,6 @@ var Main = function(_super) {
         var e = new AssetAdapter;
         egret.registerImplementation("eui.IAssetAdapter", e),
         egret.registerImplementation("eui.IThemeAdapter", new ThemeAdapter),
-        "true" == egret.getOption("isLog") || (console.log = function() {
-            return !1
-        }
-        ),
         this.runGame()["catch"](function(t) {
             console.log(t)
         }),
